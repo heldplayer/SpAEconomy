@@ -1,0 +1,46 @@
+name: SpAEconomy
+main: com.SpAEconomy.SpAEconomy
+description: A plugin that adds an economy to the server.
+author: heldplayer
+authors: [ heldplayer, mbl111 ]
+version: 1.0
+commands:
+  money:
+    description: Allows control over money
+    usage: /<command>
+    permission: spaeconomy.money
+permissions:
+  spaeconomy.*:
+    children:
+      spaeconomy.money: true
+      spaeconomy.top: true
+      spaeconomy.pay: true
+      spaeconomy.give: true
+      spaeconomy.take: true
+      spaeconomy.hide: true
+      spaeconomy.remove: true
+      spaeconomy.set: true
+  spaeconomy.money:
+    description: Allows a player to have a bank account
+    default: true
+  spaeconomy.top:
+    description: Allows a player to look at the top ranked players
+    default: true
+  spaeconomy.pay:
+    description: Allows a player to pay another player
+    default: true
+  spaeconomy.give:
+    description: Allows a player to introduce money into the economy
+    default: op
+  spaeconomy.take:
+    description: Allows a player to remove money from the economy
+    default: op
+  spaeconomy.hide:
+    description: Allows players to hide themselves or others from the top ranked players
+    default: op
+  spaeconomy.remove:
+    description: Allows players to remove a pleyr's bank account
+    default: op
+  spaeconomy.set:
+    description: Allows players to set the amount of money a player has
+    default: op
