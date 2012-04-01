@@ -1,0 +1,12 @@
+###
+#  SpAEconomy
+# A plugin developed by heldplayer and mbl111
+# written for the SpecialAttack.net Minecraft server
+###
+create-on-first-join = true
+starting-money = 1000
+money-name = dollars
+db-url = 
+db-username = 
+db-password = 
+debug = false
