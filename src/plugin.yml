@@ -2,8 +2,9 @@ name: SpAEconomy
 main: com.SpAEconomy.SpAEconomy
 description: A plugin that adds an economy to the server.
 author: heldplayer
-authors: [ heldplayer, mbl111 ]
+authors: [ mbl111 ]
 version: 1.0
+prefix: SpAEcon
 commands:
   money:
     description: Allows control over money
