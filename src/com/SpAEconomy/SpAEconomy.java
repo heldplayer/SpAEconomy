@@ -15,9 +15,9 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.SpAEconomy.cache.cacheManager;
-import com.SpAEconomy.cache.cacheQeue;
-import com.SpAEconomy.listeners.playerListener;
+import com.SpAEconomy.cache.CacheManager;
+import com.SpAEconomy.cache.CacheQeue;
+import com.SpAEconomy.listeners.PlayerListener;
 import com.SpAEconomy.system.Accounts;
 import com.SpAEconomy.system.Database;
 import com.SpAEconomy.system.DbUtils;
@@ -33,15 +33,15 @@ public class SpAEconomy extends JavaPlugin {
 	private final String separator = System.getProperty("line.separator");
 	public Accounts accounts;
 	public Database Database;
-	public cacheManager cmg;
-	public cacheQeue cq;
+	public CacheManager cmg;
+	public CacheQeue cq;
 	// Logger
 	private static Logger log;
 	// Listeners
-	private final playerListener pListener = new playerListener(this);
+	private final PlayerListener pListener = new PlayerListener(this);
 	// Config
 	public File configFile = null;
-	public config cfg;
+	public Config cfg;
 	public static boolean createOnFirstJoin = false;
 	public static double startingMoney = 0.0;
 	public static String moneyName = "dollars";
@@ -71,7 +71,7 @@ public class SpAEconomy extends JavaPlugin {
 
 		configFile = new File(dataPath + "/config.txt");
 
-		cfg = new config(this, configFile);
+		cfg = new Config(this, configFile);
 		cfg.load();
 
 		createOnFirstJoin = cfg.getBoolean("create-on-first-join", true);
@@ -111,8 +111,8 @@ public class SpAEconomy extends JavaPlugin {
 		}
 
 		this.accounts = new Accounts(this);
-		this.cmg = new cacheManager(this);
-		this.cq = new cacheQeue(this);
+		this.cmg = new CacheManager(this);
+		this.cq = new CacheQeue(this);
 
 		this.getCommand("money").setExecutor(new MoneyCommand(this));
 

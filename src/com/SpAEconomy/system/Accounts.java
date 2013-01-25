@@ -1,8 +1,8 @@
 package com.SpAEconomy.system;
 
 import com.SpAEconomy.SpAEconomy;
-import com.SpAEconomy.cache.cacheQeueObject;
-import com.SpAEconomy.cache.cachedAccount;
+import com.SpAEconomy.cache.CacheQeueObject;
+import com.SpAEconomy.cache.CachedAccount;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,9 +64,9 @@ public class Accounts {
 			}
 		}
 
-		main.cmg.addToCache(new cachedAccount(name, balance));
+		main.cmg.addToCache(new CachedAccount(name, balance));
 
-		cacheQeueObject toRun = new cacheQeueObject() {
+		CacheQeueObject toRun = new CacheQeueObject() {
 
 			@Override
 			public boolean run() {
@@ -157,7 +157,7 @@ public class Accounts {
 			main.cmg.setBalance(name, balance);
 		}
 
-		cacheQeueObject toRun = new cacheQeueObject() {
+		CacheQeueObject toRun = new CacheQeueObject() {
 
 			@Override
 			public boolean run() {
@@ -197,7 +197,7 @@ public class Accounts {
 			main.cmg.setHidden(name, hidden);
 		}
 
-		cacheQeueObject toRun = new cacheQeueObject() {
+		CacheQeueObject toRun = new CacheQeueObject() {
 
 			@Override
 			public boolean run() {
