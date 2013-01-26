@@ -1,5 +1,5 @@
 name: SpAEconomy
-main: com.SpAEconomy.SpAEconomy
+main: me.heldplayer.SpAEconomy.SpAEconomy
 description: A plugin that adds an economy to the server.
 author: heldplayer
 authors: [ mbl111 ]
@@ -14,34 +14,50 @@ permissions:
   spaeconomy.*:
     children:
       spaeconomy.money: true
-      spaeconomy.top: true
-      spaeconomy.pay: true
-      spaeconomy.give: true
-      spaeconomy.take: true
-      spaeconomy.hide: true
-      spaeconomy.remove: true
-      spaeconomy.set: true
+      spaeconomy.command.*: true
   spaeconomy.money:
-    description: Allows a player to have a bank account
     default: true
-  spaeconomy.top:
-    description: Allows a player to look at the top ranked players
+  spaeconomy.command.*:
+    children:
+      spaeconomy.command.view: true
+      spaeconomy.command.view.others: true
+      spaeconomy.command.give: true
+      spaeconomy.command.give.others: true
+      spaeconomy.command.take: true
+      spaeconomy.command.take.others: true
+      spaeconomy.command.accounts: true
+      spaeconomy.command.accounts.others: true
+      spaeconomy.command.pay: true
+      spaeconomy.command.create: true
+      spaeconomy.command.create.withmoney: true
+      spaeconomy.command.create.differentbank: true
+      spaeconomy.command.remove: true
+      spaeconomy.command.remove.differentbank: true
+  spaeconomy.command.view:
     default: true
-  spaeconomy.pay:
-    description: Allows a player to pay another player
+  spaeconomy.command.view.others:
     default: true
-  spaeconomy.give:
-    description: Allows a player to introduce money into the economy
+  spaeconomy.command.give:
     default: op
-  spaeconomy.take:
-    description: Allows a player to remove money from the economy
+  spaeconomy.command.give.others:
     default: op
-  spaeconomy.hide:
-    description: Allows players to hide themselves or others from the top ranked players
+  spaeconomy.command.take:
     default: op
-  spaeconomy.remove:
-    description: Allows players to remove a pleyr's bank account
+  spaeconomy.command.take.others:
     default: op
-  spaeconomy.set:
-    description: Allows players to set the amount of money a player has
+  spaeconomy.command.accounts:
+    default: true
+  spaeconomy.command.accounts.others:
+    default: true
+  spaeconomy.command.pay:
+    default: true
+  spaeconomy.command.create:
+    default: op
+  spaeconomy.command.create.withmoney:
+    default: op
+  spaeconomy.command.create.differentbank:
+    default: op
+  spaeconomy.command.remove:
+    default: op
+  spaeconomy.command.remove.differentbank:
     default: op

@@ -56,19 +56,19 @@ public class Accounts {
         }
     }
 
-    public void create(String name, double balance) {
-        this.create(name, balance, true);
+    public void create(String name, String account, double balance) {
+        this.create(name, account, balance, true);
     }
 
-    public void create(final String name, final double balance, boolean checkCache) {
+    public void create(final String name, final String account, final double balance, boolean checkCache) {
         if (checkCache) {
-            if (this.exists(name, false, false)) {
+            if (this.exists(name, account, false, false)) {
                 SpAEconomy.warning("Tried to create a new bank account for " + name + " but one already exists!");
                 return;
             }
         }
 
-        this.main.cmg.addToCache(new CachedAccount(name, balance));
+        this.main.cacheManager.addToCache(new CachedAccount(name, account, balance));
 
         CacheQeueObject toRun = new CacheQeueObject() {
 
@@ -79,7 +79,7 @@ public class Accounts {
 
                     QueryRunner run = new QueryRunner();
                     Accounts.this.pingConnection();
-                    run.update(c, "INSERT INTO SpAEconomy (playername, balance) " + "VALUES (?, ?)", new Object[] { name, balance });
+                    run.update(c, "INSERT INTO SpAEconomy (playername, balance, account) " + "VALUES (?, ?, ?)", new Object[] { name, balance, account });
 
                     SpAEconomy.debug("Done creating an account for " + name + "!");
                     return true;
@@ -91,25 +91,25 @@ public class Accounts {
             }
         };
 
-        this.main.cq.add(toRun);
+        this.main.cacheQue.add(toRun);
     }
 
-    public void remove(final String name, boolean checkCache) {
+    public void remove(final String name, String account, boolean checkCache) {
         if (checkCache) {
-            if (!this.exists(name, false, false)) {
+            if (!this.exists(name, account, false, false)) {
                 SpAEconomy.warning("Tried to remove " + name + "'s account but it doesn't exist yet!");
                 return;
             }
         }
 
-        this.main.cmg.unCache(name);
+        this.main.cacheManager.unCache(name, account);
 
         try {
             SpAEconomy.debug("Removing " + name + "'s account...");
 
             QueryRunner run = new QueryRunner();
             this.pingConnection();
-            run.update(c, "DELETE FROM SpAEconomy WHERE playername=?", new Object[] { name });
+            run.update(c, "DELETE FROM SpAEconomy WHERE playername=? AND account=?", new Object[] { name, account });
 
             SpAEconomy.debug("Done removing " + name + "'s account!");
         }
@@ -118,21 +118,21 @@ public class Accounts {
         }
     }
 
-    public boolean exists(String name, boolean fake) {
-        return this.exists(name, fake, true);
+    public boolean exists(String name, String account, boolean fake) {
+        return this.exists(name, account, fake, true);
     }
 
-    public boolean exists(String name, boolean fake, boolean checkCache) {
+    public boolean exists(String name, String account, boolean fake, boolean checkCache) {
         if (fake) {
             return true;
         }
 
         if (checkCache) {
-            if (this.main.cmg.isCached(name)) {
+            if (this.main.cacheManager.isCached(name, account)) {
                 return true;
             }
             else {
-                if (this.main.cmg.constructCache(name)) {
+                if (this.main.cacheManager.constructCache(name, account)) {
                     return true;
                 }
                 else {
@@ -142,29 +142,41 @@ public class Accounts {
             }
         }
         else {
-            return this.main.cmg.isCached(name);
+            return this.main.cacheManager.isCached(name, account);
         }
     }
 
-    public void giveMoney(String name, double amount) {
-        double newAmount = this.getBalance(name) + amount;
+    public void giveMoney(String name, String account, double amount) {
+        double balance = this.getBalance(name, account);
 
-        this.setBalance(name, newAmount);
+        if (balance == Double.NaN) {
+            return;
+        }
+
+        double newAmount = balance + amount;
+
+        this.setBalance(name, account, newAmount);
     }
 
-    public void takeMoney(String name, double amount) {
-        double newAmount = this.getBalance(name) - amount;
+    public void takeMoney(String name, String account, double amount) {
+        double balance = this.getBalance(name, account);
 
-        this.setBalance(name, newAmount);
+        if (balance == Double.NaN) {
+            return;
+        }
+
+        double newAmount = balance - amount;
+
+        this.setBalance(name, account, newAmount);
     }
 
-    public void setBalance(final String name, final double balance) {
-        if (this.main.cmg.isCached(name)) {
-            this.main.cmg.setBalance(name, balance);
+    public void setBalance(final String name, final String account, final double balance) {
+        if (this.main.cacheManager.isCached(name, account)) {
+            this.main.cacheManager.setBalance(name, account, balance);
         }
         else {
-            this.main.cmg.constructCache(name);
-            this.main.cmg.setBalance(name, balance);
+            this.main.cacheManager.constructCache(name, account);
+            this.main.cacheManager.setBalance(name, account, balance);
         }
 
         CacheQeueObject toRun = new CacheQeueObject() {
@@ -176,7 +188,7 @@ public class Accounts {
 
                     QueryRunner run = new QueryRunner();
                     Accounts.this.pingConnection();
-                    run.update(c, "UPDATE SpAEconomy SET balance=? WHERE playername=?", new Object[] { balance, name });
+                    run.update(c, "UPDATE SpAEconomy SET balance=? WHERE playername=? AND account=?", new Object[] { balance, name, account });
 
                     SpAEconomy.debug("Done setting a player's balance!");
                     return true;
@@ -188,26 +200,26 @@ public class Accounts {
             }
         };
 
-        this.main.cq.add(toRun);
+        this.main.cacheQue.add(toRun);
     }
 
-    public double getBalance(String name) {
-        if (this.main.cmg.isCached(name)) {
-            return this.main.cmg.getBalance(name);
+    public Double getBalance(String name, String account) {
+        if (this.main.cacheManager.isCached(name, account)) {
+            return this.main.cacheManager.getBalance(name, account);
         }
         else {
-            this.main.cmg.constructCache(name);
-            return this.main.cmg.getBalance(name);
+            this.main.cacheManager.constructCache(name, account);
+            return this.main.cacheManager.getBalance(name, account);
         }
     }
 
-    public void setHidden(final String name, final boolean hidden) {
-        if (this.main.cmg.isCached(name)) {
-            this.main.cmg.setHidden(name, hidden);
+    public void setHidden(final String name, final String account, final boolean hidden) {
+        if (this.main.cacheManager.isCached(name, account)) {
+            this.main.cacheManager.setHidden(name, account, hidden);
         }
         else {
-            this.main.cmg.constructCache(name);
-            this.main.cmg.setHidden(name, hidden);
+            this.main.cacheManager.constructCache(name, account);
+            this.main.cacheManager.setHidden(name, account, hidden);
         }
 
         CacheQeueObject toRun = new CacheQeueObject() {
@@ -219,7 +231,7 @@ public class Accounts {
 
                     QueryRunner run = new QueryRunner();
                     Accounts.this.pingConnection();
-                    run.update(c, "UPDATE SpAEconomy SET hidden=? WHERE playername=?", new Object[] { hidden, name });
+                    run.update(c, "UPDATE SpAEconomy SET hidden=? WHERE playername=? AND account=?", new Object[] { hidden, name, account });
 
                     SpAEconomy.debug("Done hiding a player!");
                     return true;
@@ -231,16 +243,16 @@ public class Accounts {
             }
         };
 
-        this.main.cq.add(toRun);
+        this.main.cacheQue.add(toRun);
     }
 
-    public boolean getHidden(String name) {
-        if (this.main.cmg.isCached(name)) {
-            return this.main.cmg.getHidden(name);
+    public boolean getHidden(String name, String account) {
+        if (this.main.cacheManager.isCached(name, account)) {
+            return this.main.cacheManager.getHidden(name, account);
         }
         else {
-            this.main.cmg.constructCache(name);
-            return this.main.cmg.getHidden(name);
+            this.main.cacheManager.constructCache(name, account);
+            return this.main.cacheManager.getHidden(name, account);
         }
     }
 

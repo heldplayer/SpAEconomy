@@ -19,8 +19,15 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (SpAEconomy.createOnFirstJoin && event.getPlayer().hasPermission("spaeconomy.money")) {
-            if (event.getPlayer() != null && !this.main.accounts.exists(event.getPlayer().getName(), false)) {
-                this.main.accounts.create(event.getPlayer().getName(), SpAEconomy.startingMoney);
+
+            for (int i = 0; i < SpAEconomy.accountNames.size(); i++) {
+                String account = SpAEconomy.accountNames.get(i);
+
+                if (!this.main.accounts.exists(event.getPlayer().getName(), account, false)) {
+                    if (account != null) {
+                        this.main.accounts.create(event.getPlayer().getName(), account, SpAEconomy.startingMoney);
+                    }
+                }
             }
         }
     }

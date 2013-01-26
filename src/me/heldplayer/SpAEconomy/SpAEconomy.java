@@ -10,10 +10,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import me.heldplayer.SpAEconomy.cache.CacheManager;
 import me.heldplayer.SpAEconomy.cache.CacheQeue;
+import me.heldplayer.SpAEconomy.command.MoneyCommand;
 import me.heldplayer.SpAEconomy.listeners.PlayerListener;
 import me.heldplayer.SpAEconomy.system.Accounts;
 import me.heldplayer.SpAEconomy.system.Database;
@@ -21,6 +26,10 @@ import me.heldplayer.SpAEconomy.system.DbUtils;
 import me.heldplayer.SpAEconomy.system.MissingDriver;
 import me.heldplayer.SpAEconomy.system.QueryRunner;
 
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,59 +37,77 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class SpAEconomy extends JavaPlugin {
 
     // Plugin specific variables
+    public static SpAEconomy instance;
     public PluginManager pm;
     public PluginDescriptionFile pdf;
-    public String dataPath = "";
     private final String separator = System.getProperty("line.separator");
     public Accounts accounts;
     public Database Database;
-    public CacheManager cmg;
-    public CacheQeue cq;
+    public CacheManager cacheManager;
+    public CacheQeue cacheQue;
     // Logger
     private static Logger log;
     // Listeners
     private final PlayerListener pListener = new PlayerListener(this);
     // Config
-    public File configFile = null;
-    public Config cfg;
+    private FileConfiguration config;
     public static boolean createOnFirstJoin = false;
     public static double startingMoney = 0.0;
     public static String moneyName = "dollars";
     public static boolean debug = false;
+    public static String defaultAccountName = "world";
+    public static HashMap<String, String> worlds = new HashMap<String, String>();
+    public static ArrayList<String> accountNames = new ArrayList<String>();
 
     @Override
     public void onDisable() {
-        this.cq.run();
+        this.cacheQue.run();
         info("Disabled!");
     }
 
     @Override
     public void onEnable() {
+        instance = this;
+
         long start = System.currentTimeMillis();
 
         log = this.getLogger();
 
-        this.dataPath = this.getDataFolder().getAbsolutePath();
         this.pm = this.getServer().getPluginManager();
         this.pdf = this.getDescription();
 
-        File dataFolder = this.getDataFolder();
+        config = this.getConfig();
 
-        if (!dataFolder.exists()) {
-            dataFolder.mkdir();
+        FileConfiguration defConfig = YamlConfiguration.loadConfiguration(getResource("config.yml"));
+
+        config.setDefaults(defConfig);
+
+        createOnFirstJoin = config.getBoolean("create-on-first-join", true);
+        startingMoney = config.getDouble("starting-money", 0);
+        moneyName = config.getString("money-name", "dollars");
+        debug = config.getBoolean("debug", false);
+        defaultAccountName = config.getString("default-account-name", "world");
+        ConfigurationSection section = config.getConfigurationSection("world-accounts");
+
+        Set<String> keys = section.getKeys(false);
+
+        Iterator<String> i = keys.iterator();
+
+        while (i.hasNext()) {
+            String world = i.next();
+
+            String account = section.getString(world, "false");
+
+            if (!account.equalsIgnoreCase("false")) {
+                worlds.put(world, account);
+
+                if (!accountNames.contains(account)) {
+                    accountNames.add(account);
+                }
+            }
         }
 
-        this.configFile = new File(this.dataPath + "/config.txt");
-
-        this.cfg = new Config(this, this.configFile);
-        this.cfg.load();
-
-        createOnFirstJoin = this.cfg.getBoolean("create-on-first-join", true);
-        startingMoney = this.cfg.getDouble("starting-money", 0);
-        moneyName = this.cfg.getString("money-name", "dollars");
-        debug = this.cfg.getBoolean("debug", false);
-
-        this.cfg.save();
+        this.saveConfig();
 
         if (!new File("lib", "mysql.jar").exists()) {
             info("Downloading mysql.jar...");
@@ -89,10 +116,17 @@ public class SpAEconomy extends JavaPlugin {
         }
 
         try {
-            this.Database = new Database(this.cfg.getString("db-url", ""), this.cfg.getString("db-username", ""), this.cfg.getString("db-password", ""));
+            this.Database = new Database(this.config.getString("db-url", ""), this.config.getString("db-username", ""), this.config.getString("db-password", ""));
 
             if (!this.Database.tableExists("SpAEconomy")) {
-                String SQL = "CREATE TABLE IF NOT EXISTS `SpAEconomy` (" + this.separator + "  `id` int(11) NOT NULL AUTO_INCREMENT," + this.separator + "  `playername` varchar(32) NOT NULL," + this.separator + "  `balance` double NOT NULL," + this.separator + "  `hidden` boolean DEFAULT false," + this.separator + "  UNIQUE KEY `playername` (`playername`)," + this.separator + "  PRIMARY KEY `id` (`id`)" + this.separator + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+                String SQL = "CREATE TABLE IF NOT EXISTS `SpAEconomy` (" + this.separator //
+                        + "  `id` int(11) NOT NULL AUTO_INCREMENT," + this.separator //
+                        + "  `playername` varchar(32) NOT NULL," + this.separator // 
+                        + "  `balance` double NOT NULL," + this.separator //
+                        + "  `account` varchar(32) NOT NULL," + this.separator //
+                        + "  `hidden` boolean DEFAULT false," + this.separator //
+                        + "  PRIMARY KEY `id` (`id`)" + this.separator //
+                        + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";//
                 try {
                     QueryRunner run = new QueryRunner();
                     Connection c = this.Database.getConnection();
@@ -100,7 +134,7 @@ public class SpAEconomy extends JavaPlugin {
                         run.update(c, SQL);
                     }
                     catch (SQLException ex) {
-                        info("Error creating database: " + ex);
+                        info("Error creating table: " + ex);
                     }
                     finally {
                         DbUtils.close(c);
@@ -116,12 +150,12 @@ public class SpAEconomy extends JavaPlugin {
         }
 
         this.accounts = new Accounts(this);
-        this.cmg = new CacheManager(this);
-        this.cq = new CacheQeue(this);
+        this.cacheManager = new CacheManager(this);
+        this.cacheQue = new CacheQeue(this);
 
-        this.getCommand("money").setExecutor(new MoneyCommand(this));
+        this.getCommand("money").setExecutor(new MoneyCommand());
 
-        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, this.cq, 1200, 1200);
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, this.cacheQue, 1200, 1200);
 
         this.getServer().getPluginManager().registerEvents(this.pListener, this);
 
@@ -205,5 +239,9 @@ public class SpAEconomy extends JavaPlugin {
         if (debug) {
             info(message);
         }
+    }
+
+    public static String getAccountForWorld(World world) {
+        return worlds.get(world.getName());
     }
 }
