@@ -31,7 +31,7 @@ public class AccountsSubCommand extends SubCommand {
                 for (int i = 0; i < SpAEconomy.accountNames.size(); i++) {
                     String account = SpAEconomy.accountNames.get(i);
 
-                    if (accounts.exists(name, account, false)) {
+                    if (accounts.exists(name, account)) {
                         sender.sendMessage(ChatColor.GRAY + account + ": " + ChatColor.DARK_GREEN + SpAEconomy.roundToDecimals(accounts.getBalance(name, account), 2) + " " + SpAEconomy.moneyName);
 
                         hasAccounts = true;
@@ -59,7 +59,7 @@ public class AccountsSubCommand extends SubCommand {
             for (int i = 0; i < SpAEconomy.accountNames.size(); i++) {
                 String account = SpAEconomy.accountNames.get(i);
 
-                if (accounts.exists(name, account, false)) {
+                if (accounts.exists(name, account)) {
                     sender.sendMessage(ChatColor.GRAY + account + ": " + ChatColor.DARK_GREEN + SpAEconomy.roundToDecimals(accounts.getBalance(name, account), 2) + " " + SpAEconomy.moneyName);
 
                     hasAccounts = true;

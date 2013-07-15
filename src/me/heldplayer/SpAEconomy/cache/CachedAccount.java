@@ -1,35 +1,52 @@
 
 package me.heldplayer.SpAEconomy.cache;
 
+import me.heldplayer.SpAEconomy.SpAEconomy;
+import me.heldplayer.SpAEconomy.tables.Account;
+
 public class CachedAccount {
 
-    public final String owner;
-    public final String account;
-    public double balance = 0;
-    public boolean hidden = false;
+    private Account accountRow;
 
-    public CachedAccount(String owner, String account) {
-        this.owner = owner.toLowerCase();
-        this.account = account.toLowerCase();
+    public CachedAccount(Account accountRow) {
+        this.accountRow = accountRow;
     }
 
-    public CachedAccount(String owner, String account, double balance) {
-        this.owner = owner.toLowerCase();
-        this.account = account.toLowerCase();
-        this.balance = balance;
+    public Account getAccountRow() {
+        return this.accountRow;
     }
 
-    public CachedAccount(String owner, String account, double balance, boolean hidden) {
-        this.owner = owner.toLowerCase();
-        this.account = account.toLowerCase();
-        this.balance = balance;
-        this.hidden = hidden;
+    public String getOwner() {
+        return this.accountRow.getOwner();
+    }
+
+    public String getAccount() {
+        return this.accountRow.getAccount();
+    }
+
+    public double getBalance() {
+        return this.accountRow.getBalance();
+    }
+
+    public void setBalance(double balance) {
+        this.accountRow.setBalance(balance);
+    }
+
+    public boolean isHidden() {
+        return this.accountRow.isHidden();
+    }
+
+    public void setHidden(boolean hidden) {
+        this.accountRow.setHidden(hidden);
     }
 
     public void destroy() {
-        try {
-            this.finalize();
-        }
-        catch (Throwable ex) {}
+        this.accountRow = null;
     }
+
+    @Override
+    public String toString() {
+        return "[CachedAccount \"" + this.getOwner() + "\":\"" + this.getAccount() + "\"@\"" + SpAEconomy.formatMoney(this.getBalance()) + "\" " + (this.isHidden() ? "hidden" : "visible") + "]";
+    }
+
 }

@@ -2,9 +2,6 @@ create-on-first-join: true
 starting-money: 0
 money-name: "dollars"
 debug: false
-db-url: localhost
-db-username: username
-db-password: password
 default-account-name: world
 world-accounts: 
   world: world

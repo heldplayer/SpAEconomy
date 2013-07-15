@@ -2,6 +2,7 @@
 package me.heldplayer.SpAEconomy.command;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class GiveSubCommand extends SubCommand {
                     return;
                 }
 
-                if (!accounts.exists(name, account, false)) {
+                if (!accounts.exists(name, account)) {
                     sender.sendMessage(ChatColor.RED + "You do not have a bank account.");
                 }
                 else {
@@ -85,7 +86,7 @@ public class GiveSubCommand extends SubCommand {
                 account = SpAEconomy.getAccountForWorld(((Player) sender).getWorld());
             }
 
-            if (!accounts.exists(name, account, false)) {
+            if (!accounts.exists(name, account)) {
                 sender.sendMessage(ChatColor.RED + name + " has no bank account.");
             }
             else {
@@ -118,7 +119,7 @@ public class GiveSubCommand extends SubCommand {
                 return;
             }
 
-            if (!accounts.exists(name, account, false)) {
+            if (!accounts.exists(name, account)) {
                 sender.sendMessage(ChatColor.RED + name + " has no bank account.");
             }
             else {
@@ -144,7 +145,7 @@ public class GiveSubCommand extends SubCommand {
             return null;
         }
         else if (args.length == 3) {
-            ArrayList<String> accountNames = SpAEconomy.accountNames;
+            LinkedList<String> accountNames = SpAEconomy.accountNames;
 
             for (int i = 0; i < accountNames.size(); i++) {
                 String accountName = accountNames.get(i);
@@ -157,7 +158,6 @@ public class GiveSubCommand extends SubCommand {
 
         return result;
     }
-
 
     @Override
     public String[] getHelpMessage() {

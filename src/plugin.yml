@@ -4,6 +4,7 @@ description: A plugin that adds an economy to the server.
 author: heldplayer
 authors: [ mbl111 ]
 version: 1.0
+database: true
 prefix: SpAEcon
 commands:
   money:

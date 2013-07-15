@@ -45,10 +45,10 @@ public class PaySubCommand extends SubCommand {
                 return;
             }
 
-            if (!accounts.exists(sender.getName(), account, false)) {
+            if (!accounts.exists(sender.getName(), account)) {
                 sender.sendMessage(ChatColor.RED + "You do not have a bank account.");
             }
-            else if (!accounts.exists(name, account, false)) {
+            else if (!accounts.exists(name, account)) {
                 sender.sendMessage(ChatColor.RED + name + " has no bank account.");
             }
             else {
@@ -94,5 +94,4 @@ public class PaySubCommand extends SubCommand {
         return new String[] { this.name + " account amount" };
     }
 
-   
 }

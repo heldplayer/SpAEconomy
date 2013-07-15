@@ -2,6 +2,7 @@
 package me.heldplayer.SpAEconomy.command;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,11 +39,11 @@ public class RemoveSubCommand extends SubCommand {
                 return;
             }
 
-            if (!accounts.exists(name, account, false)) {
+            if (!accounts.exists(name, account)) {
                 sender.sendMessage(ChatColor.RED + "An account with that name doesn't exists.");
             }
             else {
-                accounts.remove(name, account, false);
+                accounts.remove(name, account);
 
                 sender.sendMessage(ChatColor.DARK_GREEN + "Deleted account");
             }
@@ -66,11 +67,11 @@ public class RemoveSubCommand extends SubCommand {
                 account = SpAEconomy.getAccountForWorld(((Player) sender).getWorld());
             }
 
-            if (!accounts.exists(name, account, false)) {
+            if (!accounts.exists(name, account)) {
                 sender.sendMessage(ChatColor.RED + "An account with that name doesn't exists.");
             }
             else {
-                accounts.remove(name, account, false);
+                accounts.remove(name, account);
 
                 sender.sendMessage(ChatColor.DARK_GREEN + "Deleted account");
             }
@@ -92,7 +93,7 @@ public class RemoveSubCommand extends SubCommand {
             return null;
         }
         else if (args.length == 2) {
-            ArrayList<String> accountNames = SpAEconomy.accountNames;
+            LinkedList<String> accountNames = SpAEconomy.accountNames;
 
             for (int i = 0; i < accountNames.size(); i++) {
                 String accountName = accountNames.get(i);

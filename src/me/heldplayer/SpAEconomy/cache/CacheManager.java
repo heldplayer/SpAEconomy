@@ -1,172 +1,108 @@
 
 package me.heldplayer.SpAEconomy.cache;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import me.heldplayer.SpAEconomy.SpAEconomy;
-import me.heldplayer.SpAEconomy.system.Accounts;
-import me.heldplayer.SpAEconomy.system.QueryRunner;
-import me.heldplayer.SpAEconomy.system.ResultSetHandler;
+import me.heldplayer.SpAEconomy.tables.Account;
 
 public class CacheManager {
 
-    private ArrayList<CachedAccount> cache;
+    private LinkedList<CachedAccount> cache;
     private final SpAEconomy main;
-    private static ResultSetHandler<Double> returnBalance = new ResultSetHandler<Double>() {
-
-        @Override
-        public Double handle(ResultSet rs) throws SQLException {
-            if (rs.next()) {
-                return Double.valueOf(rs.getDouble("balance"));
-            }
-            return null;
-        }
-    };
-    private static ResultSetHandler<Boolean> returnHidden = new ResultSetHandler<Boolean>() {
-
-        @Override
-        public Boolean handle(ResultSet rs) throws SQLException {
-            if (rs.next()) {
-                return rs.getBoolean("hidden");
-            }
-            return null;
-        }
-    };
 
     public CacheManager(SpAEconomy plugin) {
         this.main = plugin;
-        this.cache = new ArrayList<CachedAccount>();
+        this.cache = new LinkedList<CachedAccount>();
     }
 
     public void addToCache(CachedAccount account) {
         this.cache.add(account);
 
         SpAEconomy.debug("Added account to cache");
-        SpAEconomy.debug("Username: " + account.owner + "; Account: " + account.account + "; Balance: " + account.balance);
+        SpAEconomy.debug("Owner: " + account.getOwner() + "; Account: " + account.getAccount() + "; Balance: " + account.getBalance() + "; Hidden: " + account.isHidden());
     }
 
-    public void unCache(String name, String account) {
-        Object[] accounts = this.cache.toArray();
+    public void unCache(String owner, String account) {
+        CachedAccount cachedAccount = this.getCachedAccount(owner, account);
 
-        for (Object accountObj : accounts) {
-            CachedAccount cachedAccount = (CachedAccount) accountObj;
-            if (cachedAccount.owner.equalsIgnoreCase(name) && cachedAccount.account.equals(account)) {
-                this.cache.remove(this.cache.indexOf(cachedAccount));
-                SpAEconomy.debug("Removed " + name + " from cache memory");
-                cachedAccount.destroy();
-            }
+        if (cachedAccount != null) {
+            this.cache.remove(cachedAccount);
+            SpAEconomy.debug("Removed " + cachedAccount.toString() + " from cache memory");
+            cachedAccount.destroy();
         }
     }
 
-    public boolean constructCache(String name, String account) {
-        name = name.toLowerCase();
+    public CachedAccount constructCache(String owner, String account) {
+        CachedAccount cachedAccount = this.getCachedAccount(owner, account);
 
-        this.main.accounts.pingConnection();
-
-        Double balance = null;
-        Boolean hidden = null;
-
-        try {
-            QueryRunner run = new QueryRunner();
-            balance = (Double) run.query(Accounts.c, "SELECT balance FROM SpAEconomy WHERE playername=? AND account=?", returnBalance, new Object[] { name, account });
-            balance = SpAEconomy.roundToDecimals(balance, 2);
-        }
-        catch (SQLException ex) {
-            SpAEconomy.warning("Database Error: " + ex);
-            return false;
-        }
-        catch (NullPointerException ex) {
-            SpAEconomy.debug("Can't construct cache for " + name);
-            SpAEconomy.debug("The player needs a bank account!");
-            return false;
+        if (cachedAccount != null) {
+            return cachedAccount;
         }
 
-        try {
-            QueryRunner run = new QueryRunner();
-            hidden = (Boolean) run.query(Accounts.c, "SELECT hidden FROM SpAEconomy WHERE playername=? AND account=?", returnHidden, new Object[] { name, account });
-        }
-        catch (SQLException ex) {
-            SpAEconomy.warning("Database Error: " + ex);
-            return false;
-        }
-        catch (NullPointerException ex) {
-            SpAEconomy.debug("Can't construct cache for " + name);
-            SpAEconomy.debug("The player needs a bank account!");
-            return false;
+        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+
+        if (accountRow == null) {
+            return null;
         }
 
-        CachedAccount cachedAccount = new CachedAccount(name, account, balance, hidden);
+        cachedAccount = new CachedAccount(accountRow);
         this.addToCache(cachedAccount);
-        return true;
+        return cachedAccount;
     }
 
-    public boolean isCached(String name, String account) {
-        name = name.toLowerCase();
+    public boolean isCached(String owner, String account, boolean cacheIfDoesnt) {
+        return cacheIfDoesnt ? this.constructCache(owner, account) != null : this.getCachedAccount(owner, account) != null;
+    }
 
-        Object[] objects = this.cache.toArray();
+    public double getBalance(String owner, String account) {
+        CachedAccount cachedAccount = this.constructCache(owner, account);
 
-        for (Object object : objects) {
-            if (((CachedAccount) object).owner.equals(name) && ((CachedAccount) object).account.equals(account)) {
-                return true;
-            }
+        if (cachedAccount != null) {
+            return cachedAccount.getBalance();
+        }
+
+        return 0.0D;
+    }
+
+    public void setBalance(String owner, String account, double balance) {
+        CachedAccount cachedAccount = this.constructCache(owner, account);
+
+        if (cachedAccount != null) {
+            cachedAccount.setBalance(balance);
+
+            // TODO: send to database
+        }
+    }
+
+    public boolean getHidden(String owner, String account) {
+        CachedAccount cachedAccount = this.constructCache(owner, account);
+
+        if (cachedAccount != null) {
+            return cachedAccount.isHidden();
         }
 
         return false;
     }
 
-    public Double getBalance(String name, String account) {
-        name = name.toLowerCase();
+    public void setHidden(String owner, String account, boolean hidden) {
+        CachedAccount cachedAccount = this.constructCache(owner, account);
 
-        Object[] objects = this.cache.toArray();
+        if (cachedAccount != null) {
+            cachedAccount.setHidden(hidden);
 
-        for (Object object : objects) {
-            if (((CachedAccount) object).owner.equals(name) && ((CachedAccount) object).account.equals(account)) {
-                return ((CachedAccount) object).balance;
+            // TODO: send to database
+        }
+    }
+
+    private CachedAccount getCachedAccount(String owner, String account) {
+        for (CachedAccount cachedAccount : this.cache) {
+            if (cachedAccount.getOwner().equals(owner) && cachedAccount.getAccount().equals(account)) {
+                return cachedAccount;
             }
         }
 
         return null;
     }
 
-    public void setBalance(String name, String account, double balance) {
-        name = name.toLowerCase();
-
-        Object[] objects = this.cache.toArray();
-
-        for (Object object : objects) {
-            if (((CachedAccount) object).owner.equals(name) && ((CachedAccount) object).account.equals(account)) {
-                ((CachedAccount) object).balance = balance;
-                return;
-            }
-        }
-    }
-
-    public Boolean getHidden(String name, String account) {
-        name = name.toLowerCase();
-
-        Object[] objects = this.cache.toArray();
-
-        for (Object object : objects) {
-            if (((CachedAccount) object).owner.equals(name) && ((CachedAccount) object).account.equals(account)) {
-                return ((CachedAccount) object).hidden;
-            }
-        }
-
-        return null;
-    }
-
-    public void setHidden(String name, String account, boolean hidden) {
-        name = name.toLowerCase();
-
-        Object[] objects = this.cache.toArray();
-
-        for (Object object : objects) {
-            if (((CachedAccount) object).owner.equals(name) && ((CachedAccount) object).account.equals(account)) {
-                ((CachedAccount) object).hidden = hidden;
-                return;
-            }
-        }
-    }
 }

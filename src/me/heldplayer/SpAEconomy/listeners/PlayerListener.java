@@ -23,7 +23,7 @@ public class PlayerListener implements Listener {
             for (int i = 0; i < SpAEconomy.accountNames.size(); i++) {
                 String account = SpAEconomy.accountNames.get(i);
 
-                if (!this.main.accounts.exists(event.getPlayer().getName(), account, false)) {
+                if (!this.main.accounts.exists(event.getPlayer().getName(), account)) {
                     if (account != null) {
                         this.main.accounts.create(event.getPlayer().getName(), account, SpAEconomy.startingMoney);
                     }

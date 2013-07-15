@@ -21,13 +21,14 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
     public final Map<String, SubCommand> aliases = new HashMap<String, SubCommand>();
 
     public MoneyCommand() {
-        new MoneySubCommand("get", "spaeconomy.command.view", commands, aliases, "count", "amount", "money", "view");
-        new GiveSubCommand("give", "spaeconomy.command.give", commands, aliases, "increase", "increment", "add", "+", "++");
-        new TakeSubCommand("take", "spaeconomy.command.take", commands, aliases, "decrease", "decrement", "-", "--");
-        new AccountsSubCommand("accounts", "spaeconomy.command.accounts", commands, aliases, "list", "acs", "moneys");
-        new PaySubCommand("pay", "spaeconomy.command.pay", commands, aliases);
-        new CreateSubCommand("create", "spaeconomy.command.create", commands, aliases, "new", "insert");
-        new RemoveSubCommand("remove", "spaeconomy.command.remove", commands, aliases, "delete");
+        new MoneySubCommand("get", "spaeconomy.command.view", this.commands, this.aliases, "count", "amount", "money", "view");
+        new GiveSubCommand("give", "spaeconomy.command.give", this.commands, this.aliases, "increase", "increment", "add", "+", "++");
+        new TakeSubCommand("take", "spaeconomy.command.take", this.commands, this.aliases, "decrease", "decrement", "-", "--");
+        new AccountsSubCommand("accounts", "spaeconomy.command.accounts", this.commands, this.aliases, "list", "acs", "moneys");
+        new PaySubCommand("pay", "spaeconomy.command.pay", this.commands, this.aliases);
+        new CreateSubCommand("create", "spaeconomy.command.create", this.commands, this.aliases, "new", "insert");
+        new RemoveSubCommand("remove", "spaeconomy.command.remove", this.commands, this.aliases, "delete");
+        new TopSubCommand("top", "spaeconomy.command.top", this.commands, this.aliases);
     }
 
     @Override
@@ -38,10 +39,10 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            commands.get("get").runCommand(sender, "get");
+            this.commands.get("get").runCommand(sender, "get");
         }
         else if (args[0].equalsIgnoreCase("help")) {
-            Set<Entry<String, SubCommand>> commandSet = commands.entrySet();
+            Set<Entry<String, SubCommand>> commandSet = this.commands.entrySet();
 
             for (Entry<String, SubCommand> entry : commandSet) {
                 SubCommand subCommand = entry.getValue();
@@ -63,10 +64,10 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
             }
         }
         else {
-            SubCommand subCommand = commands.get(args[0]);
+            SubCommand subCommand = this.commands.get(args[0]);
 
             if (subCommand == null) {
-                subCommand = aliases.get(args[0]);
+                subCommand = this.aliases.get(args[0]);
             }
 
             if (subCommand == null) {
@@ -98,7 +99,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             ArrayList<String> complements = new ArrayList<String>();
 
-            Set<Entry<String, SubCommand>> commandSet = commands.entrySet();
+            Set<Entry<String, SubCommand>> commandSet = this.commands.entrySet();
 
             for (Entry<String, SubCommand> entry : commandSet) {
                 SubCommand subCommand = entry.getValue();
@@ -110,22 +111,24 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
                     continue;
                 }
 
-                if (subCommand.name.toLowerCase().startsWith(args[0].toLowerCase()))
+                if (subCommand.name.toLowerCase().startsWith(args[0].toLowerCase())) {
                     complements.add(subCommand.name);
+                }
 
                 for (String commandAlias : subCommand.aliases) {
-                    if (args[0].length() != 0 && commandAlias.toLowerCase().startsWith(args[0].toLowerCase()))
+                    if (args[0].length() != 0 && commandAlias.toLowerCase().startsWith(args[0].toLowerCase())) {
                         complements.add(commandAlias);
+                    }
                 }
             }
 
             return complements;
         }
         else {
-            SubCommand subCommand = commands.get(args[0]);
+            SubCommand subCommand = this.commands.get(args[0]);
 
             if (subCommand == null) {
-                subCommand = aliases.get(args[0]);
+                subCommand = this.aliases.get(args[0]);
             }
 
             if (subCommand == null) {
