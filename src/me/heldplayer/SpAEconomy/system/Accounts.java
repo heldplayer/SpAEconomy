@@ -93,7 +93,7 @@ public class Accounts {
         CachedAccount cachedAccount = this.main.cacheManager.constructCache(owner, account);
 
         if (cachedAccount != null) {
-            cachedAccount.setHidden(true);
+            cachedAccount.setHidden(hidden);
 
             this.main.getDatabase().update(cachedAccount.getAccountRow());
         }
@@ -114,7 +114,7 @@ public class Accounts {
 
         CachedAccount[] result = new CachedAccount[amount];
 
-        List<Account> list = this.main.getDatabase().find(Account.class).setMaxRows(amount).orderBy("balance DESC").where().eq("account", account).findList();
+        List<Account> list = this.main.getDatabase().find(Account.class).setMaxRows(amount).orderBy("balance DESC").where().eq("account", account).eq("hidden", false).findList();
 
         if (list.size() <= 0) {
             return null;

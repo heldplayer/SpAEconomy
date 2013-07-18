@@ -14,9 +14,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class GiveSubCommand extends AbstractSubCommand {
+public class HideSubCommand extends AbstractSubCommand {
 
-    public GiveSubCommand(AbstractMultiCommand command, String name, String permissions, String... aliases) {
+    public HideSubCommand(AbstractMultiCommand command, String name, String permissions, String... aliases) {
         super(command, name, permissions, aliases);
     }
 
@@ -31,18 +31,12 @@ public class GiveSubCommand extends AbstractSubCommand {
             if (sender instanceof Player) {
                 String name = sender.getName();
                 String account = SpAEconomy.getAccountForWorld(((Player) sender).getWorld());
-                Double amount = 0.0D;
-
-                try {
-                    amount = Double.valueOf(args[0]);
+                boolean hide = false;
+                if (args[0].equalsIgnoreCase("true")) {
+                    hide = true;
                 }
-                catch (NumberFormatException ex) {
-                    sender.sendMessage(ChatColor.RED + "Invalid amount entered.");
-                    return;
-                }
-
-                if (amount <= 0.0D) {
-                    sender.sendMessage(ChatColor.RED + "Invalid amount entered.");
+                else if (!args[0].equalsIgnoreCase("false")) {
+                    sender.sendMessage(ChatColor.RED + "Invalid value entered.");
                     return;
                 }
 
@@ -50,9 +44,14 @@ public class GiveSubCommand extends AbstractSubCommand {
                     sender.sendMessage(ChatColor.RED + "You do not have a bank account.");
                 }
                 else {
-                    accounts.giveMoney(name, account, amount);
+                    accounts.setHidden(name, account, hide);
 
-                    sender.sendMessage(ChatColor.DARK_GREEN + "You now have " + SpAEconomy.roundToDecimals(accounts.getBalance(name, account), 2) + " " + SpAEconomy.moneyName);
+                    if (hide) {
+                        sender.sendMessage(ChatColor.DARK_GREEN + "You have been hidden");
+                    }
+                    else {
+                        sender.sendMessage(ChatColor.DARK_GREEN + "You are now visible to the world again");
+                    }
                 }
             }
             else {
@@ -68,18 +67,12 @@ public class GiveSubCommand extends AbstractSubCommand {
             }
 
             String account = SpAEconomy.defaultAccountName;
-            Double amount = 0.0D;
-
-            try {
-                amount = Double.valueOf(args[0]);
+            boolean hide = false;
+            if (args[0].equalsIgnoreCase("true")) {
+                hide = true;
             }
-            catch (NumberFormatException ex) {
-                sender.sendMessage(ChatColor.RED + "Invalid amount entered.");
-                return;
-            }
-
-            if (amount <= 0.0D) {
-                sender.sendMessage(ChatColor.RED + "Invalid amount entered.");
+            else if (!args[0].equalsIgnoreCase("false")) {
+                sender.sendMessage(ChatColor.RED + "Invalid value entered.");
                 return;
             }
 
@@ -91,9 +84,14 @@ public class GiveSubCommand extends AbstractSubCommand {
                 sender.sendMessage(ChatColor.RED + name + " has no bank account.");
             }
             else {
-                accounts.giveMoney(name, account, amount);
+                accounts.setHidden(name, account, hide);
 
-                sender.sendMessage(ChatColor.DARK_GREEN + name + " now has " + SpAEconomy.roundToDecimals(accounts.getBalance(name, account), 2) + " " + SpAEconomy.moneyName);
+                if (hide) {
+                    sender.sendMessage(ChatColor.DARK_GREEN + name + " is now hidden");
+                }
+                else {
+                    sender.sendMessage(ChatColor.DARK_GREEN + name + " is now visible to the world again");
+                }
             }
         }
         else if (args.length == 3) {
@@ -105,18 +103,12 @@ public class GiveSubCommand extends AbstractSubCommand {
             }
 
             String account = args[2];
-            Double amount = 0.0D;
-
-            try {
-                amount = Double.valueOf(args[0]);
+            boolean hide = false;
+            if (args[0].equalsIgnoreCase("true")) {
+                hide = true;
             }
-            catch (NumberFormatException ex) {
-                sender.sendMessage(ChatColor.RED + "Invalid amount entered.");
-                return;
-            }
-
-            if (amount <= 0.0D) {
-                sender.sendMessage(ChatColor.RED + "Invalid amount entered.");
+            else if (!args[0].equalsIgnoreCase("false")) {
+                sender.sendMessage(ChatColor.RED + "Invalid value entered.");
                 return;
             }
 
@@ -124,9 +116,14 @@ public class GiveSubCommand extends AbstractSubCommand {
                 sender.sendMessage(ChatColor.RED + name + " has no bank account.");
             }
             else {
-                accounts.giveMoney(name, account, amount);
+                accounts.setHidden(name, account, hide);
 
-                sender.sendMessage(ChatColor.DARK_GREEN + name + " now has " + SpAEconomy.roundToDecimals(accounts.getBalance(name, account), 2) + " " + SpAEconomy.moneyName);
+                if (hide) {
+                    sender.sendMessage(ChatColor.DARK_GREEN + name + " is now hidden");
+                }
+                else {
+                    sender.sendMessage(ChatColor.DARK_GREEN + name + " is now visible to the world again");
+                }
             }
         }
         else {
@@ -141,7 +138,13 @@ public class GiveSubCommand extends AbstractSubCommand {
 
     @Override
     public List<String> getTabCompleteResults(CommandSender sender, String alias, String... args) {
-        if (args.length == 2) {
+        if (args.length == 1) {
+            ArrayList<String> result = new ArrayList<String>();
+            result.add("true");
+            result.add("false");
+            return result;
+        }
+        else if (args.length == 2) {
             return null;
         }
         else if (args.length == 3) {
@@ -165,7 +168,7 @@ public class GiveSubCommand extends AbstractSubCommand {
 
     @Override
     public String[] getHelpMessage() {
-        return new String[] { this.name + " amount [account [bank]]" };
+        return new String[] { this.name + " true/false [account [bank]]" };
     }
 
 }

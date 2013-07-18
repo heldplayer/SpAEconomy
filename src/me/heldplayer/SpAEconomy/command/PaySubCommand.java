@@ -1,22 +1,22 @@
 
 package me.heldplayer.SpAEconomy.command;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import me.heldplayer.SpAEconomy.SpAEconomy;
 import me.heldplayer.SpAEconomy.system.Accounts;
+import net.specialattack.core.command.AbstractMultiCommand;
+import net.specialattack.core.command.AbstractSubCommand;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class PaySubCommand extends SubCommand {
+public class PaySubCommand extends AbstractSubCommand {
 
-    public PaySubCommand(String name, String permissions, Map<String, SubCommand> commandsMap, Map<String, SubCommand> aliasesMap, String... aliases) {
-        super(name, permissions, commandsMap, aliasesMap, aliases);
+    public PaySubCommand(AbstractMultiCommand command, String name, String permissions, String... aliases) {
+        super(command, name, permissions, aliases);
     }
 
     @Override
@@ -81,12 +81,11 @@ public class PaySubCommand extends SubCommand {
 
     @Override
     public List<String> getTabCompleteResults(CommandSender sender, String alias, String... args) {
-        ArrayList<String> result = new ArrayList<String>();
         if (args.length == 1) {
             return null;
         }
 
-        return result;
+        return emptyTabResult;
     }
 
     @Override
