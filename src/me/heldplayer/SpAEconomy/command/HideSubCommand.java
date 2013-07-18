@@ -16,8 +16,14 @@ import org.bukkit.entity.Player;
 
 public class HideSubCommand extends AbstractSubCommand {
 
+    private final List<String> trueFalseResult;
+
     public HideSubCommand(AbstractMultiCommand command, String name, String permissions, String... aliases) {
         super(command, name, permissions, aliases);
+
+        this.trueFalseResult = new ArrayList<String>();
+        this.trueFalseResult.add("true");
+        this.trueFalseResult.add("false");
     }
 
     @Override
@@ -139,10 +145,7 @@ public class HideSubCommand extends AbstractSubCommand {
     @Override
     public List<String> getTabCompleteResults(CommandSender sender, String alias, String... args) {
         if (args.length == 1) {
-            ArrayList<String> result = new ArrayList<String>();
-            result.add("true");
-            result.add("false");
-            return result;
+            return this.trueFalseResult;
         }
         else if (args.length == 2) {
             return null;
