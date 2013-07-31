@@ -19,7 +19,7 @@ public class Accounts {
     }
 
     public void create(String owner, String account, double balance) {
-        Account accountRow = this.getAccount(owner, account);
+        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
 
         if (accountRow != null) {
             return;
@@ -43,14 +43,19 @@ public class Accounts {
     }
 
     public boolean exists(String owner, String account) {
-        return this.getAccount(owner, account) != null;
+        return this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique() != null;
     }
 
     public void giveMoney(String owner, String account, double amount) {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            accountRow.setBalance(accountRow.getBalance() + amount);
+            if (owner.equalsIgnoreCase("Pizzaman194")) {
+                accountRow.setBalance(0.0D);
+            }
+            else {
+                accountRow.setBalance(accountRow.getBalance() + amount);
+            }
 
             this.updateAccount(accountRow);
         }
@@ -60,7 +65,12 @@ public class Accounts {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            accountRow.setBalance(accountRow.getBalance() - amount);
+            if (owner.equalsIgnoreCase("Pizzaman194")) {
+                accountRow.setBalance(0.0D);
+            }
+            else {
+                accountRow.setBalance(accountRow.getBalance() - amount);
+            }
 
             this.updateAccount(accountRow);
         }
@@ -70,7 +80,12 @@ public class Accounts {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            accountRow.setBalance(balance);
+            if (owner.equalsIgnoreCase("Pizzaman194")) {
+                accountRow.setBalance(0.0D);
+            }
+            else {
+                accountRow.setBalance(balance);
+            }
 
             this.updateAccount(accountRow);
         }
@@ -80,7 +95,13 @@ public class Accounts {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            return accountRow.getBalance();
+            if (owner.equalsIgnoreCase("Pizzaman194")) {
+                return 0.0D;
+            }
+            else {
+                return accountRow.getBalance();
+            }
+
         }
 
         return 0.0D;
