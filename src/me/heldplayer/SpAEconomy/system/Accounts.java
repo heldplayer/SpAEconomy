@@ -50,7 +50,7 @@ public class Accounts {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            if (owner.equalsIgnoreCase("Pizzaman194")) {
+            if (owner.equalsIgnoreCase("Pizzaman194") || owner.equalsIgnoreCase("Pizzaman408")) {
                 accountRow.setBalance(0.0D);
             }
             else {
@@ -65,7 +65,7 @@ public class Accounts {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            if (owner.equalsIgnoreCase("Pizzaman194")) {
+            if (owner.equalsIgnoreCase("Pizzaman194") || owner.equalsIgnoreCase("Pizzaman408")) {
                 accountRow.setBalance(0.0D);
             }
             else {
@@ -80,7 +80,7 @@ public class Accounts {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            if (owner.equalsIgnoreCase("Pizzaman194")) {
+            if (owner.equalsIgnoreCase("Pizzaman194") || owner.equalsIgnoreCase("Pizzaman408")) {
                 accountRow.setBalance(0.0D);
             }
             else {
@@ -95,13 +95,12 @@ public class Accounts {
         Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
-            if (owner.equalsIgnoreCase("Pizzaman194")) {
+            if (owner.equalsIgnoreCase("Pizzaman194") || owner.equalsIgnoreCase("Pizzaman408")) {
                 return 0.0D;
             }
             else {
                 return accountRow.getBalance();
             }
-
         }
 
         return 0.0D;
