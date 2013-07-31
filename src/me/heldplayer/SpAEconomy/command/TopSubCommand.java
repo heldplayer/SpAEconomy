@@ -4,8 +4,8 @@ package me.heldplayer.SpAEconomy.command;
 import java.util.List;
 
 import me.heldplayer.SpAEconomy.SpAEconomy;
-import me.heldplayer.SpAEconomy.cache.CachedAccount;
 import me.heldplayer.SpAEconomy.system.Accounts;
+import me.heldplayer.SpAEconomy.tables.Account;
 import net.specialattack.core.command.AbstractMultiCommand;
 import net.specialattack.core.command.AbstractSubCommand;
 
@@ -35,16 +35,16 @@ public class TopSubCommand extends AbstractSubCommand {
             account = args[1];
         }
 
-        CachedAccount[] list = accounts.getTopAccounts(count, account);
+        Account[] list = accounts.getTopAccounts(count, account);
 
         if (list == null) {
             sender.sendMessage(ChatColor.RED + "Nobody has such a bank account or any money");
         }
         else {
             for (int i = 0; i < list.length; i++) {
-                CachedAccount cachedAccount = list[i];
-                if (cachedAccount != null) {
-                    sender.sendMessage(ChatColor.DARK_GREEN.toString() + (i + 1) + ". " + ChatColor.WHITE + cachedAccount.getOwner() + ChatColor.DARK_GREEN + " has " + ChatColor.WHITE + SpAEconomy.formatMoney(cachedAccount.getBalance()));
+                Account accountRow = list[i];
+                if (accountRow != null) {
+                    sender.sendMessage(ChatColor.DARK_GREEN.toString() + (i + 1) + ". " + ChatColor.WHITE + accountRow.getOwner() + ChatColor.DARK_GREEN + " has " + ChatColor.WHITE + SpAEconomy.formatMoney(accountRow.getBalance()));
                 }
             }
         }

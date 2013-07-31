@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
-import me.heldplayer.SpAEconomy.cache.CacheManager;
 import me.heldplayer.SpAEconomy.command.MoneyCommand;
 import me.heldplayer.SpAEconomy.listeners.PlayerListener;
 import me.heldplayer.SpAEconomy.system.Accounts;
@@ -33,8 +32,7 @@ public class SpAEconomy extends JavaPlugin {
     public PluginManager pm;
     public PluginDescriptionFile pdf;
 
-    public Accounts accounts;
-    public CacheManager cacheManager;
+    public volatile Accounts accounts;
 
     private static Logger log;
 
@@ -103,7 +101,6 @@ public class SpAEconomy extends JavaPlugin {
         this.saveConfig();
 
         this.accounts = new Accounts(this);
-        this.cacheManager = new CacheManager(this);
 
         this.getCommand("money").setExecutor(new MoneyCommand());
 
