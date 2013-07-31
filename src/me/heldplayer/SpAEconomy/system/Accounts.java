@@ -14,8 +14,12 @@ public class Accounts {
         this.main = plugin;
     }
 
+    public Account getAccount(String owner, String account) {
+        return this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+    }
+
     public void create(String owner, String account, double balance) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             return;
@@ -31,7 +35,7 @@ public class Accounts {
     }
 
     public void remove(String owner, String account) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             this.main.getDatabase().delete(accountRow);
@@ -39,11 +43,11 @@ public class Accounts {
     }
 
     public boolean exists(String owner, String account) {
-        return this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique() != null;
+        return this.getAccount(owner, account) != null;
     }
 
     public void giveMoney(String owner, String account, double amount) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             accountRow.setBalance(accountRow.getBalance() + amount);
@@ -53,7 +57,7 @@ public class Accounts {
     }
 
     public void takeMoney(String owner, String account, double amount) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             accountRow.setBalance(accountRow.getBalance() - amount);
@@ -63,7 +67,7 @@ public class Accounts {
     }
 
     public void setBalance(String owner, String account, double balance) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             accountRow.setBalance(balance);
@@ -73,7 +77,7 @@ public class Accounts {
     }
 
     public double getBalance(String owner, String account) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             return accountRow.getBalance();
@@ -83,7 +87,7 @@ public class Accounts {
     }
 
     public void setHidden(String owner, String account, boolean hidden) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             accountRow.setHidden(hidden);
@@ -93,7 +97,7 @@ public class Accounts {
     }
 
     public boolean getHidden(String owner, String account) {
-        Account accountRow = this.main.getDatabase().find(Account.class).where().eq("owner", owner).eq("account", account).findUnique();
+        Account accountRow = this.getAccount(owner, account);
 
         if (accountRow != null) {
             return accountRow.isHidden();
