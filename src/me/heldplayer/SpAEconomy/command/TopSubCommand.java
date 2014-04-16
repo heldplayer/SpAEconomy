@@ -6,8 +6,8 @@ import java.util.List;
 import me.heldplayer.SpAEconomy.SpAEconomy;
 import me.heldplayer.SpAEconomy.system.Accounts;
 import me.heldplayer.SpAEconomy.tables.Account;
-import net.specialattack.core.command.AbstractMultiCommand;
-import net.specialattack.core.command.AbstractSubCommand;
+import net.specialattack.bukkit.core.command.AbstractMultiCommand;
+import net.specialattack.bukkit.core.command.AbstractSubCommand;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

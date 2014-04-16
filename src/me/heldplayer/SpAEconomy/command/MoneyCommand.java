@@ -1,8 +1,8 @@
 
 package me.heldplayer.SpAEconomy.command;
 
-import net.specialattack.core.command.AbstractMultiCommand;
-import net.specialattack.core.command.HelpSubCommand;
+import net.specialattack.bukkit.core.command.AbstractMultiCommand;
+import net.specialattack.bukkit.core.command.HelpSubCommand;
 
 public class MoneyCommand extends AbstractMultiCommand {
 
